@@ -331,6 +331,69 @@ def split_time_series_data(
     return X_train, y_train, X_test, y_test
 
 
+# def fetch_batch_raw_data(
+#     from_date: Union[datetime, str],
+#     to_date: Union[datetime, str]
+# ) -> pd.DataFrame:
+#     """
+#     Simulates production batch data by sampling Citi Bike data from 52 weeks ago.
+
+#     Args:
+#         from_date (datetime or str): Start datetime of batch window.
+#         to_date (datetime or str): End datetime of batch window.
+
+#     Returns:
+#         pd.DataFrame: Simulated batch data with 'started_at' and 'start_station_id'.
+#     """
+#     # Parse strings if needed
+#     if isinstance(from_date, str):
+#         from_date = datetime.fromisoformat(from_date)
+#     if isinstance(to_date, str):
+#         to_date = datetime.fromisoformat(to_date)
+
+#     # Validate input
+#     if not isinstance(from_date, datetime) or not isinstance(to_date, datetime):
+#         raise ValueError("from_date and to_date must be datetime or ISO strings")
+#     if from_date >= to_date:
+#         raise ValueError("from_date must be earlier than to_date")
+
+#     # Shift 52 weeks back
+#     hist_from = from_date - timedelta(weeks=52)
+#     hist_to = to_date - timedelta(weeks=52)
+
+#     # Load month of hist_from
+#     rides_from = load_and_process_citibike_data(
+#         year=hist_from.year, months=[hist_from.month]
+#     )
+#     #rides_from = rides_from[rides_from['started_at'] >= pd.to_datetime(hist_from)]
+
+#     hist_from = pd.to_datetime(hist_from).tz_localize(None)
+#     rides_from['started_at'] = pd.to_datetime(rides_from['started_at']).dt.tz_localize(None)
+#     rides_from = rides_from[rides_from['started_at'] >= hist_from]
+
+
+#     # If hist_to is a different month, load and combine
+#     if hist_to.month != hist_from.month:
+#         rides_to = load_and_process_citibike_data(
+#             year=hist_to.year, months=[hist_to.month]
+#         )
+#         #rides_to = rides_to[rides_to['started_at'] < pd.to_datetime(hist_to)]
+#         rides = pd.concat([rides_from, rides_to], ignore_index=True)
+#     else:
+#         rides = rides_from
+
+#     # Shift forward 52 weeks
+#     rides["started_at"] += timedelta(weeks=52)
+
+#     # Sort for consistency
+#     rides.sort_values(by=["start_station_id", "started_at"], inplace=True)
+
+#     return rides
+
+from typing import Union
+from datetime import datetime, timedelta
+import pandas as pd
+
 def fetch_batch_raw_data(
     from_date: Union[datetime, str],
     to_date: Union[datetime, str]
@@ -361,34 +424,36 @@ def fetch_batch_raw_data(
     hist_from = from_date - timedelta(weeks=52)
     hist_to = to_date - timedelta(weeks=52)
 
+    # Ensure both comparison values are tz-naive
+    hist_from = pd.to_datetime(hist_from).tz_localize(None)
+    hist_to = pd.to_datetime(hist_to).tz_localize(None)
+
     # Load month of hist_from
     rides_from = load_and_process_citibike_data(
         year=hist_from.year, months=[hist_from.month]
     )
-    #rides_from = rides_from[rides_from['started_at'] >= pd.to_datetime(hist_from)]
-
-    hist_from = pd.to_datetime(hist_from).tz_localize(None)
-    rides_from['started_at'] = pd.to_datetime(rides_from['started_at']).dt.tz_localize(None)
+    rides_from['started_at'] = pd.to_datetime(rides_from['started_at'], errors='coerce').dt.tz_localize(None)
     rides_from = rides_from[rides_from['started_at'] >= hist_from]
-
 
     # If hist_to is a different month, load and combine
     if hist_to.month != hist_from.month:
         rides_to = load_and_process_citibike_data(
             year=hist_to.year, months=[hist_to.month]
         )
-        rides_to = rides_to[rides_to['started_at'] < pd.to_datetime(hist_to)]
+        rides_to['started_at'] = pd.to_datetime(rides_to['started_at'], errors='coerce').dt.tz_localize(None)
+        rides_to = rides_to[rides_to['started_at'] < hist_to]
         rides = pd.concat([rides_from, rides_to], ignore_index=True)
     else:
         rides = rides_from
 
-    # Shift forward 52 weeks
+    # Shift forward 52 weeks to simulate current batch
     rides["started_at"] += timedelta(weeks=52)
 
     # Sort for consistency
     rides.sort_values(by=["start_station_id", "started_at"], inplace=True)
 
     return rides
+
 
 
 def transform_ts_data_into_features(
