@@ -9,7 +9,8 @@ parent_dir = str(Path(__file__).parent.parent)
 sys.path.append(parent_dir)
 
 from src.plot_utils import plot_aggregated_time_series
-from src.inference import get_latest_predictions
+#from src.inference import get_latest_predictions
+from src.inference import fetch_predictions as get_latest_predictions
 
 st.set_page_config(page_title="Citi Bike Prediction Dashboard", layout="wide")
 st.title("🚲 Citi Bike Demand Forecasting")
