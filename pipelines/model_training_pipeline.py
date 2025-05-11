@@ -51,7 +51,7 @@ if test_mae < metric.get("test_mae", float("inf")):
     mr = project.get_model_registry()
     mr.python.create_model(
         name=config.MODEL_NAME,
-        model_dir=model_dir,
+        #model_dir=model_dir,
         metrics={"test_mae": test_mae},
         model_schema=model_schema,
         description="LightGBM model trained on Citi Bike data",
