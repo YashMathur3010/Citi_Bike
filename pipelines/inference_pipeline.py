@@ -33,8 +33,8 @@ ts_data = ts_data.sort_values(["start_station_id", "hour"]).reset_index(drop=Tru
 ts_data["hour"] = ts_data["hour"].dt.tz_localize(None)
 
 # Transform to sliding window features
-from src.data_utils import transform_ts_data_info_features
-features = transform_ts_data_info_features(
+from src.data_utils import transform_ts_data_into_features
+features = transform_ts_data_into_features(
     ts_data, window_size=24 * 28, step_size=23
 )
 
