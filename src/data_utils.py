@@ -365,7 +365,12 @@ def fetch_batch_raw_data(
     rides_from = load_and_process_citibike_data(
         year=hist_from.year, months=[hist_from.month]
     )
-    rides_from = rides_from[rides_from['started_at'] >= pd.to_datetime(hist_from)]
+    #rides_from = rides_from[rides_from['started_at'] >= pd.to_datetime(hist_from)]
+
+    hist_from = pd.to_datetime(hist_from).tz_localize(None)
+    rides_from['started_at'] = pd.to_datetime(rides_from['started_at']).dt.tz_localize(None)
+    rides_from = rides_from[rides_from['started_at'] >= hist_from]
+
 
     # If hist_to is a different month, load and combine
     if hist_to.month != hist_from.month:
