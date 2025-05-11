@@ -159,8 +159,8 @@ def transform_raw_data_into_ts_data(rides: pd.DataFrame) -> pd.DataFrame:
     for the top 3 most used start stations.
     """
     rides['hour'] = pd.to_datetime(rides['started_at']).dt.floor('H')
-    #top_stations = rides['start_station_id'].value_counts().nlargest(3).index.tolist()
-    rides_top = rides.copy()#[rides['start_station_id'].isin(top_stations)].copy()
+    top_stations = rides['start_station_id'].value_counts().nlargest(3).index.tolist()
+    rides_top = rides.copy()[rides['start_station_id'].isin(top_stations)].copy()
 
     grouped = (
         rides_top.groupby(['hour', 'start_station_id'])
