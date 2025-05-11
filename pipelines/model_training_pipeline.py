@@ -40,7 +40,7 @@ if test_mae < metric.get("test_mae", float("inf")):
 
     # Upload updated model
     project = get_hopsworks_project()
-    model_dir = config.MODEL_OUTPUT_DIR
+    model_dir = config.MODELS_DIR
     model_dir.mkdir(parents=True, exist_ok=True)
 
     joblib.dump(pipeline, model_dir / "lgb_model.pkl")
