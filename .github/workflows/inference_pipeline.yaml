@@ -26,4 +26,4 @@ jobs:
       - name: Run Citi Bike inference pipeline
         env:
           HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
-        run: python -m src.inference_pipeline
+        run: python -m pipelines.inference_pipeline
