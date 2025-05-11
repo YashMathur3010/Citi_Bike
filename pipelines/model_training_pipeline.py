@@ -4,7 +4,7 @@ from hsml.schema import Schema
 from sklearn.metrics import mean_absolute_error
 
 import src.config as config
-from src.data_utils import transform_ts_data_info_features_and_target
+from src.data_utils import transform_ts_data_into_features_and_target
 from src.inference import (
     fetch_days_data,
     get_hopsworks_project,
@@ -18,7 +18,7 @@ print("Fetching data from group store ...")
 ts_data = fetch_days_data(180)  # fetch 180 days from last year
 
 print("Transforming to features and targets ...")
-features, targets = transform_ts_data_info_features_and_target(
+features, targets = transform_ts_data_into_features_and_target(
     ts_data, window_size=24 * 28, step_size=23
 )
 
